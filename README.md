@@ -5,7 +5,7 @@
 
 Partial implementation of [JSON Ref](http://tools.ietf.org/html/draft-pbryan-zyp-json-ref-00) draft. The URI can only contain a fragment pointing to a value inside the document at this moment.
 
-## Installation
+## Install
 
 Add this line to your application's Gemfile:
 
