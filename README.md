@@ -9,15 +9,15 @@ Partial implementation of [JSON Ref](http://tools.ietf.org/html/draft-pbryan-zyp
 
 Add this line to your application's Gemfile:
 
-  gem 'json-ref'
+    gem 'json-ref'
 
 And then execute:
 
-  $ bundle
+    $ bundle
 
 Or install it yourself as:
 
-  $ gem install json-ref
+    $ gem install json-ref
 
 ## Usage
 
