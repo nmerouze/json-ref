@@ -5,18 +5,21 @@ class JSONRef
   
   def initialize(document)
     @document = document
+    @refs = []
   end
 
   def expand
-    @document.each do |k,v|
-      if v.is_a?(Hash) && v.has_key?("$ref")
-        if v["$ref"] =~ /\.json$/
-          @document[k] = read_file(v["$ref"])
-        else
-          @document[k] = split_path(v["$ref"]).inject(@document) { |doc, item| doc[item] }
-        end
+    find_refs(@document).each do |path|
+      ref = path.inject(@document) { |doc, part| doc[part] }
+
+      if ref["$ref"] =~ /\.json$/
+        ref.replace read_file(ref["$ref"])
+      else
+        ref.replace split_path(ref["$ref"]).inject(@document) { |doc, part| doc[part] } # doesn't work for strings
       end
     end
+
+    @document
   end
 
   def self.expand(document)
@@ -36,5 +39,17 @@ class JSONRef
 
   def read_file(path)
     JSON.load(File.read(path))
+  end
+
+  def find_refs(doc, path = [])
+    if doc.keys.include?("$ref")
+      @refs << path
+    else
+      doc.each do |key, value|
+        find_refs(value, path + [key]) if value.is_a?(Hash)
+      end
+    end
+
+    @refs
   end
 end
