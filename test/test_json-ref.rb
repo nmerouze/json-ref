@@ -36,9 +36,16 @@ class TestJSONRef < MiniTest::Unit::TestCase
     assert_equal result_doc, JSONRef.new(origin_doc).expand
   end
 
-  def test_ref_in_array
+  def test_ref_array
     origin_doc = { "title" => [{ "value" => "foobar" }], "ref_title" => { "$ref" => "#/title" } }
     result_doc = { "title" => [{ "value" => "foobar" }], "ref_title" => [{ "value" => "foobar" }] }
+
+    assert_equal result_doc, JSONRef.new(origin_doc).expand
+  end
+
+  def test_ref_in_array
+    origin_doc = { "title" => { "value" => "foobar" }, "ref_title" => [{ "$ref" => "#/title" }] }
+    result_doc = { "title" => { "value" => "foobar" }, "ref_title" => [{ "value" => "foobar" }] }
 
     assert_equal result_doc, JSONRef.new(origin_doc).expand
   end

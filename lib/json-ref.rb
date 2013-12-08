@@ -33,10 +33,14 @@ class JSONRef
   private
 
   def find_refs(doc, path = [])
-    if doc.keys.include?("$ref")
+    if doc.has_key?("$ref")
       @refs << path
     else
       doc.each do |key, value|
+        value.each_with_index do |item, index|
+          find_refs(item, path + [key, index.to_s]) if item.is_a?(Hash)
+        end if value.is_a?(Array)
+
         find_refs(value, path + [key]) if value.is_a?(Hash)
       end
     end
