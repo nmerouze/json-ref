@@ -1,25 +1,29 @@
 require "json"
+require "hana"
 
 class JSONRef
-  VERSION = "0.2.0"
+  VERSION = "0.2.1"
   
   def initialize(document)
     @document = document
     @refs = []
+    @patches = []
   end
 
   def expand
     find_refs(@document).each do |path|
-      ref = path.inject(@document) { |doc, part| doc[part] }
+      ref = Hana::Pointer.eval(path, @document)
 
       if ref["$ref"] =~ /\.json$/
-        ref.replace read_file(ref["$ref"])
+        value = JSON.load(File.read(ref["$ref"]))
       else
-        ref.replace split_path(ref["$ref"]).inject(@document) { |doc, part| doc[part] } # doesn't work for strings
+        value = Hana::Pointer.new(ref["$ref"][1..-1]).eval(@document)
       end
+
+      @patches << { "op" => "replace", "path" => path.unshift("").join("/"), "value" => value }
     end
 
-    @document
+    Hana::Patch.new(@patches).apply(@document)
   end
 
   def self.expand(document)
@@ -27,19 +31,6 @@ class JSONRef
   end
 
   private
-
-  def split_path(path)
-    escape_characters = {"^/" => "/", "^^" => "^", "~0" => "~", "~1" => "/"}
-    return [""] if path == "#/"
-
-    path.sub(/^#\//, "").split(/(?<!\^)\//).map! { |part|
-      part.gsub!(/\^[\/^]|~[01]/) { |m| escape_characters[m] }; part
-    }
-  end
-
-  def read_file(path)
-    JSON.load(File.read(path))
-  end
 
   def find_refs(doc, path = [])
     if doc.keys.include?("$ref")
