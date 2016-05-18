@@ -1,9 +1,8 @@
 require "json"
 require "hana"
+require 'json_ref/version'
 
 class JSONRef
-  VERSION = "0.2.1"
-  
   def initialize(document)
     @document = document
     @refs = []

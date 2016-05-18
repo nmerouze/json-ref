@@ -8,6 +8,7 @@ GEM
   remote: https://rubygems.org/
   specs:
     hana (1.2.1)
+    minitest (5.9.0)
     rake (10.1.0)
 
 PLATFORMS
@@ -15,4 +16,8 @@ PLATFORMS
 
 DEPENDENCIES
   json-ref!
+  minitest
   rake
+
+BUNDLED WITH
+   1.11.2

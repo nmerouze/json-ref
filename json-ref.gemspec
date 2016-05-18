@@ -1,7 +1,7 @@
 # encoding: utf-8
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'json-ref'
+require 'json_ref/version'
 
 Gem::Specification.new do |spec|
   spec.name          = "json-ref"
@@ -19,5 +19,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "minitest"
   spec.add_dependency "hana"
 end
