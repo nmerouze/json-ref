@@ -24,8 +24,26 @@ Or install it yourself as:
 ```ruby
 origin_doc = { 'title' => 'foobar', 'ref_title' => { '$ref' => '#/title' } }
 JSONRef.new(origin_doc).expand
-# => 
+# =>
 { 'title' => 'foobar', 'ref_title' => 'foobar' }
+```
+
+It's also possible to resolve the `$ref` manually. You can specify a block and
+return with *replace* value from the block.
+
+```yaml
+# other.yaml
+author: "John Smith"
+```
+
+```ruby
+origin_doc = { "title" => "foobar", "meta" => { "$ref" => "other.yaml" } }
+JSONRef.new(origin_doc).expand do |path, ref|
+  # path => "meta"
+  # ref => "other.yml"
+  YAML.load(File.read(ref))
+end
+# => { "title" => "foobar", "meta" => { "author" => "John Smith" } }
 ```
 
 ## Contributing

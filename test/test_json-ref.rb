@@ -49,4 +49,15 @@ class TestJSONRef < MiniTest::Unit::TestCase
 
     assert_equal result_doc, JSONRef.new(origin_doc).expand
   end
+
+  def test_custom_ref_resolution
+    require 'yaml'
+    origin_doc = { "file" => { "$ref" => "test/fixtures/file.yaml" } }
+    result_doc = { "file" => { "title" => "My PDF", "path" => "/path/to/my.pdf" } }
+
+    expected_doc = JSONRef.new(origin_doc).expand do |path, ref|
+      YAML.load(File.read(ref))
+    end
+    assert_equal result_doc, expected_doc
+  end
 end

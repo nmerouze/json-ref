@@ -11,13 +11,8 @@ class JSONRef
 
   def expand
     find_refs(@document).each do |path|
-      ref = Hana::Pointer.eval(path, @document)
-
-      if ref["$ref"] =~ /\.json$/
-        value = JSON.load(File.read(ref["$ref"]))
-      else
-        value = Hana::Pointer.new(ref["$ref"][1..-1]).eval(@document)
-      end
+      ref = Hana::Pointer.eval(path, @document)['$ref']
+      value = block_given? ?  yield(path, ref) : resolve_ref(path, ref)
 
       @patches << { "op" => "replace", "path" => path.unshift("").join("/"), "value" => value }
     end
@@ -30,6 +25,14 @@ class JSONRef
   end
 
   private
+
+  def resolve_ref(path, ref)
+    if ref =~ /\.json$/
+      JSON.load(File.read(ref))
+    else
+      Hana::Pointer.new(ref[1..-1]).eval(@document)
+    end
+  end
 
   def find_refs(doc, path = [])
     if doc.has_key?("$ref")
